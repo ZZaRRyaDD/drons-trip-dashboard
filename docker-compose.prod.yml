@@ -1,0 +1,70 @@
+volumes:
+  postgres_data:
+
+services:
+  nginx:
+    image: ghcr.io/zzarryadd/nginx:latest
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - server
+    env_file:
+      - ./.env
+    deploy:
+      mode: replicated
+      replicas: 2
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+        delay: 10s
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+      restart_policy:
+        condition: any
+        delay: 20s
+        max_attempts: 5
+        window: 60s
+
+  postgres:
+    image: postgres:15
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+
+  server:
+    image: ghcr.io/zzarryadd/server:latest
+    restart: always
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      args:
+        MODE: "--without dev"
+        APP_HOME: "/server"
+    volumes:
+      - ./logs/:/server/logs/
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+    deploy:
+      mode: replicated
+      replicas: 2
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+        delay: 10s
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+      restart_policy:
+        condition: any
+        delay: 20s
+        max_attempts: 5
+        window: 60s
+    command: make run-prod

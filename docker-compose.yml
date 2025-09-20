@@ -1,0 +1,61 @@
+volumes:
+  postgres_data:
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: 'postgres'
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - ${POSTGRES_PORT}
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    command: postgres -p ${POSTGRES_PORT}
+
+  server:
+    container_name: 'server'
+    restart: always
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      args:
+        MODE: "--with dev"
+        APP_HOME: "/server"
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    volumes:
+      - ./server/:/server/
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - ENV=local
+      - APP_PORT=${APP_PORT}
+      - APP_HOST=${APP_HOST}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+    depends_on:
+      - postgres
+    command: make run
+
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: prometheus
+  #   ports:
+  #     - "9090:9090"
+
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana
+  #   environment:
+  #     - GF_SECURITY_ADMIN_USER=admin
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - prometheus

@@ -1,0 +1,117 @@
+name: CI-CD
+
+on:
+  pull_request:
+    branches: ["main"]
+
+  push:
+    branches: ["main"]
+
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: 5432
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  REGISTRY: ghcr.io
+  NGINX_IMAGE_NAME: zzarryadd/nginx:latest
+  BACKEND_IMAGE_NAME: zzarryadd/server:latest
+  APP_PORT: 8000
+  APP_HOST: 0.0.0.0
+  SECRET_KEY: XlctT801zTrepfc5PsR4U4U2vJ6HhRrPdd1Wp8SYvo
+
+jobs:
+  linters:
+    name: Run linters
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - name: Run linters
+        run: make linters
+
+  tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - name: Run tests
+        run: make test-docker
+
+  delete-old-packages:
+    name: Delete old packages
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - name: Delete old django packages
+        uses: actions/delete-package-versions@v4
+        with:
+          token: ${{ secrets.PAT }}
+          package-name: "server"
+          package-type: "container"
+          min-versions-to-keep: 5
+    
+      - name: Delete old nginx packages
+        uses: actions/delete-package-versions@v4
+        with:
+          token: ${{ secrets.PAT }}
+          package-name: "nginx"
+          package-type: "container"
+          min-versions-to-keep: 5
+
+  publish-containers:
+    name: Publish images
+    needs: [tests, linters]
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.PAT }}
+
+      - name: Build and Publish Server Image
+        run: |
+          docker build ./server --tag ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}
+          docker push ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}
+
+      - name: Build and Publish Nginx Image
+        run: |
+          docker build ./nginx --tag ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE_NAME }}
+          docker push ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE_NAME }}
+
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    needs: [publish-containers]
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Executing remote command
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd ${{ secrets.WORK_DIR }}
+            bash pull-run.sh

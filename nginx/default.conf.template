@@ -1,0 +1,34 @@
+upstream localhost {
+    server server:${APP_PORT};
+}
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    location /favicon.ico {
+        access_log     off;
+        log_not_found  off;
+    }
+
+    location / {
+        proxy_pass http://localhost/;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+
+    location /swagger {
+        proxy_pass http://localhost/swagger;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+    
+    location /openapi.json {
+        proxy_pass http://localhost/openapi.json;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+}
