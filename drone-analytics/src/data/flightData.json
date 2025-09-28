@@ -1,0 +1,30 @@
+[
+  {
+    "regionCode": "RU-MOW",
+    "regionName": "Москва",
+    "flightCount": 12500,
+    "totalDuration": 350.5,
+    "averageDuration": 16.8
+  },
+  {
+    "regionCode": "RU-SPE",
+    "regionName": "Санкт-Петербург",
+    "flightCount": 8200,
+    "totalDuration": 210.2,
+    "averageDuration": 15.4
+  },
+  {
+    "regionCode": "RU-SAR",
+    "regionName": "Саратовская область",
+    "flightCount": 1500,
+    "totalDuration": 45.0,
+    "averageDuration": 18.0
+  },
+  {
+    "regionCode": "RU-ROS",
+    "regionName": "Ростовская область",
+    "flightCount": 2100,
+    "totalDuration": 62.3,
+    "averageDuration": 17.8
+  }
+]
