@@ -1,9 +1,9 @@
 // src/components/Map/Map.js
 import React, { useLayoutEffect, useRef } from 'react';
 import $ from 'jquery';
-import './Map.css';
+import './Map.css'; // Убираем импорт, так как стили теперь внутри SVG
 
-const MyMap = ({ selectedRegionCode, onRegionSelect }) => {
+const MyMap = ({ selectedRegionCode, onRegionSelect }) => { // selectedRegionCode не используется для отображения деталей
   const mapRef = useRef(null);
 
   // SVG-контент из вашего файла

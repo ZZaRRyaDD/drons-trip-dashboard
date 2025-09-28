@@ -151,7 +151,7 @@ const FlightDashboard = ({ selectedRegionCode = null }) => { // Принимае
     setDashboardData({
       totalFlights,
       totalDuration: totalDurationMinutes,
-      averageDuration: parseFloat(averageDuration.toFixed(2)),
+      averageDuration: parseFloat(averageDuration),
       flightsByDay,
       flightsByDuration: durationBuckets,
     });
@@ -216,7 +216,7 @@ const FlightDashboard = ({ selectedRegionCode = null }) => { // Принимае
         </div>
         <div className="stat-card">
           <h3>Общая длительность (мин)</h3>
-          <p>{dashboardData.totalDuration.toFixed(2)}</p>
+          <p>{dashboardData.totalDuration}</p>
         </div>
         <div className="stat-card">
           <h3>Средняя длительность (мин)</h3>
