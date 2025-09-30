@@ -57,7 +57,7 @@ class DefaultSettings(BaseSettings):
         """
         Get uri for connection with database.
         """
-        return "postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}?sslmode=disable".format(
+        return "postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}".format(
             **self.database_settings,
         )
 
@@ -66,6 +66,6 @@ class DefaultSettings(BaseSettings):
         """
         Get uri for connection with database.
         """
-        return "postgresql://{user}:{password}@{host}:{port}/{database}?sslmode=disable".format(
+        return "postgresql://{user}:{password}@{host}:{port}/{database}".format(
             **self.database_settings,
         )

@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from pydantic import BaseModel, EmailStr, constr, validator
+from pydantic import BaseModel, EmailStr, constr, field_validator
 
 from app.config import get_settings
 
@@ -9,7 +9,7 @@ class RegistrationForm(BaseModel):
     password: constr(min_length=8)
     email: EmailStr | None
 
-    @validator("password")
+    @field_validator("password")
     def validate_password(cls, password):
         if not password:
             raise HTTPException(
@@ -20,7 +20,7 @@ class RegistrationForm(BaseModel):
         password = settings.PWD_CONTEXT.hash(password)
         return password
 
-    @validator("username")
+    @field_validator("username")
     def validate_username(cls, username):
         if not username:
             raise HTTPException(
