@@ -1,9 +1,9 @@
 // src/components/Map/Map.js
 import React, { useLayoutEffect, useRef } from 'react';
 import $ from 'jquery';
-import './Map.css'; // Убираем импорт, так как стили теперь внутри SVG
+import './Map.css';
 
-const MyMap = ({ selectedRegionCode, onRegionSelect }) => { // selectedRegionCode не используется для отображения деталей
+const MyMap = ({ selectedRegionCode, onRegionSelect }) => {
   const mapRef = useRef(null);
 
   // SVG-контент из вашего файла
@@ -111,14 +111,43 @@ const MyMap = ({ selectedRegionCode, onRegionSelect }) => { // selectedRegionCod
   useLayoutEffect(() => {
     const $map = $(mapRef.current);
 
-    // Проверяем, что элемент и jQuery доступны
     if (!$map || !$map.length) {
       console.error("jQuery не может найти элемент карты в useLayoutEffect.");
       return;
     }
 
+    // --- НОВОЕ: Добавление подсказки при наведении ---
+    const handleMouseEnter = function() {
+      const $this = $(this);
+      const title = $this.attr('data-title');
+      if (title) {
+        // Создаём или обновляем элемент подсказки
+        let $tooltip = $('.map-tooltip', $map);
+        if ($tooltip.length === 0) {
+          $tooltip = $('<div class="map-tooltip"></div>');
+          $map.append($tooltip);
+        }
+        $tooltip.text(title).show();
+      }
+    };
+
+    const handleMouseMove = function(e) {
+      const $tooltip = $('.map-tooltip', $map);
+      if ($tooltip.is(':visible')) {
+        // Позиционируем подсказку рядом с курсором
+        $tooltip.css({
+          left: e.pageX - $map.offset().left + 10, // Небольшой отступ
+          top: e.pageY - $map.offset().top + 10
+        });
+      }
+    };
+
+    const handleMouseLeave = function() {
+      $('.map-tooltip', $map).hide();
+    };
+    // --- /НОВОЕ ---
+
     const handleClick = function() {
-      // Проверяем, что элемент существует и имеет атрибуты
       const $this = $(this);
       if (!$this.attr('data-code')) {
         console.warn("Элемент клика не имеет атрибута data-code.");
@@ -131,7 +160,6 @@ const MyMap = ({ selectedRegionCode, onRegionSelect }) => { // selectedRegionCod
         onRegionSelect({ code: regionCode, title: regionTitle });
       }
 
-      // Логика открытия деталей региона (как в оригинальном коде)
       if ($('#' + regionCode).text() !== '') {
         $('.district', $map).show();
         $('.district span', $map).html(regionTitle);
@@ -152,19 +180,24 @@ const MyMap = ({ selectedRegionCode, onRegionSelect }) => { // selectedRegionCod
 
     // Привязываем обработчики
     $map.on('click', '[data-code]', handleClick);
+    $map.on('mouseenter', '[data-code]', handleMouseEnter); // Наведение
+    $map.on('mousemove', '[data-code]', handleMouseMove);   // Движение мыши
+    $map.on('mouseleave', '[data-code]', handleMouseLeave); // Уход мыши
     $('.close-district', $map).on('click', handleClose);
 
     // Очистка обработчиков при размонтировании
     return () => {
       $map.off('click', '[data-code]', handleClick);
+      $map.off('mouseenter', '[data-code]', handleMouseEnter); // Убираем при размонтировании
+      $map.off('mousemove', '[data-code]', handleMouseMove);
+      $map.off('mouseleave', '[data-code]', handleMouseLeave);
       $('.close-district', $map).off('click', handleClose);
     };
-  }, [onRegionSelect]); // Зависимость от onRegionSelect, чтобы обновлять обработчик при его изменении
+  }, [onRegionSelect]);
 
   return (
     <div ref={mapRef} className="rf-map margin-top-20" dangerouslySetInnerHTML={{ __html: mapSVGContent }} />
   );
 };
 
-// Убедитесь, что экспорт стоит
 export default MyMap;

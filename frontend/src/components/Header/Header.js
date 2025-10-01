@@ -4,7 +4,7 @@ import React from 'react';
 const Header = () => {
   return (
     <header className="app-header">
-      <h1>Анализ полетной активности дронов в РФ</h1>
+      <h1>Анализ полётов дронов в РФ</h1>
     </header>
   );
 };

@@ -1,0 +1,329 @@
+/* src/components/Map/Map.css */
+.rf-map, .rf-map * {
+  box-sizing: border-box;
+}
+
+.rf-map {
+  position: relative;
+  max-width: 980px;
+  margin: auto;
+  padding: 20px;
+}
+
+.rf-map .district b {
+  position: absolute;
+  z-index: 5;
+  width: 18px;
+  height: 18px;
+  background: rgba(51, 122, 183, 0.9);
+  border-radius: 50%;
+  left: 6px;
+  top: 18px;
+  transition: all 0.3s;
+}
+
+.rf-map .district span {
+  position: absolute;
+  z-index: 5;
+  top: 20px;
+  left: 30px;
+  font-size: 13px;
+  font-weight: bold;
+  font-family: Tahoma, sans-serif;
+  line-height: 1;
+  color: #337AB7;
+}
+
+.rf-map .district {
+  display: none;
+}
+
+.rf-map.open .district b {
+  top: 0;
+  left: 0;
+  border-radius: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.rf-map.open .district span {
+  color: #FFF;
+}
+
+.rf-map svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.5));
+}
+
+.rf-map path {
+  stroke: #FFFFFF;
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+.rf-map [data-code] {
+  fill: #337AB7;
+  transition: fill 0.2s;
+  cursor: pointer;
+}
+
+.rf-map [data-code]:hover {
+  fill: #0180ef;
+}
+
+.rf-map .district-text {
+  display: none;
+  position: absolute;
+  z-index: 6;
+  left: 0;
+  top: 60px;
+  width: calc(100% - 20px);
+  height: calc(100% - 90px);
+  padding: 0 20px;
+  overflow: auto;
+  color: #FFF;
+  font-size: 13px;
+  font-family: Verdana, sans-serif;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 5px;
+}
+
+.rf-map .district-text div {
+  padding: 10px;
+}
+
+.rf-map .close-district {
+  opacity: 0;
+  z-index: 6;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  line-height: 1;
+  font-size: 40px;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 1s;
+  pointer-events: none;
+}
+
+.rf-map.open .close-district {
+  opacity: 1;
+  pointer-events: initial;
+}
+
+.rf-map .district-links {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.rf-map .district-links div {
+  font-size: 13px;
+  font-family: Verdana, sans-serif;
+  padding: 4px;
+}
+
+.rf-map .district-links div:after {
+  content: "| ";
+  color: #337AB7;
+}
+
+.rf-map .district-links div:last-child:after {
+  content: "";
+}
+
+.dropfill {
+  fill: #337AB7 !important;
+}
+
+.mainfill {
+  fill: #1d4567 !important;
+}
+
+/* Цвета регионов */
+.rf-map [data-code="RU-SAR"] {
+  fill: #116f21;
+}
+.rf-map [data-code="RU-SA"] {
+  fill: #d17520;
+}
+.rf-map [data-code="RU-KO"] {
+  fill: #901aad;
+}
+/* ... (вставьте все остальные цвета регионов из вашего файла) ... */
+
+.rf-map [data-code="RU-SAR"]:hover {
+  fill: #1bad33;
+}
+.rf-map [data-code="RU-SA"]:hover {
+  fill: #e3954b;
+}
+.rf-map [data-code="RU-KO"]:hover {
+  fill: #bf37e1;
+}
+/* ... (вставьте все остальные hover цвета регионов из вашего файла) ... */
+
+/* Адаптивность */
+@media (min-width: 768px) {
+  .rf-map .district b {
+    width: 28px;
+    height: 28px;
+    left: 6px;
+    top: 28px;
+  }
+
+  .rf-map .district span {
+    top: 30px;
+    left: 46px;
+    font-size: 20px;
+    font-weight: normal;
+  }
+
+  .rf-map .district-text {
+    left: 30px;
+    top: 80px;
+    width: calc(100% - 60px);
+    height: calc(100% - 130px);
+    font-size: 16px;
+  }
+
+  .rf-map .close-district {
+    width: 60px;
+    height: 60px;
+    font-size: 60px;
+  }
+
+  .rf-map .district-links {
+    display: none;
+  }
+}
+
+/* src/components/Map/Map.css */
+
+/* Используем CSS-переменные из App.css для цветов */
+.rf-map [data-code] {
+  fill: var(--map-region-color, #254678); /* Цвет региона по умолчанию из переменной */
+  stroke: var(--map-region-stroke, #ffffff); /* Обводка */
+  stroke-width: 1;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: fill 0.2s ease;
+}
+
+.rf-map [data-code]:hover {
+  fill: var(--map-region-hover-color, #9ca3af); /* Цвет при наведении */
+}
+
+/* Цвета для подсветки выбранного/выделенного региона */
+.dropfill {
+  fill: var(--map-region-dropfill-color, #3b82f6) !important; /* Цвет выделенного региона */
+}
+
+.mainfill {
+  fill: var(--map-region-mainfill-color, #1d4567) !important; /* Цвет главного (выбранного) региона */
+}
+
+/* --- Остальные стили из оригинального файла --- */
+/* (Вставьте сюда все остальные CSS-правила из вашего оригинального Map.css, кроме цветов регионов) */
+/* Примеры: */
+.rf-map, .rf-map * {
+  box-sizing: border-box;
+}
+
+.rf-map {
+  position: relative;
+  max-width: 980px;
+  margin: auto;
+  padding: 20px;
+}
+
+.rf-map svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.5));
+}
+
+.rf-map path {
+  stroke: var(--map-region-stroke, #ffffff);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+/* src/components/Map/Map.css */
+
+/* Используем CSS-переменные из App.css для цветов */
+.rf-map [data-code] {
+  fill: var(--map-region-color, #d1d5db); /* Цвет региона по умолчанию из переменной */
+  stroke: var(--map-region-stroke, #ffffff); /* Обводка */
+  stroke-width: 1;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: fill 0.2s ease;
+}
+
+.rf-map [data-code]:hover {
+  fill: var(--map-region-hover-color, #9ca3af); /* Цвет при наведении */
+}
+
+/* Цвета для подсветки выбранного/выделенного региона */
+.dropfill {
+  fill: var(--map-region-dropfill-color, #3b82f6) !important; /* Цвет выделенного региона */
+}
+
+.mainfill {
+  fill: var(--map-region-mainfill-color, #1d4567) !important; /* Цвет главного (выбранного) региона */
+}
+
+/* --- Остальные стили из оригинального файла (без цветов регионов) --- */
+.rf-map, .rf-map * {
+  box-sizing: border-box;
+}
+
+.rf-map {
+  position: relative;
+  max-width: 980px;
+  margin: auto;
+  padding: 20px;
+}
+
+.rf-map svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.5));
+}
+
+.rf-map path {
+  stroke: var(--map-region-stroke, #ffffff);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+/* src/components/Map/Map.css - добавляем в конец файла */
+
+/* --- Стили для подсказки --- */
+.rf-map {
+  position: relative; /* Убедимся, что позиционирование относительно этого элемента */
+}
+
+.map-tooltip {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.8); /* Тёмный полупрозрачный фон */
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  pointer-events: none; /* Подсказка не должна мешать кликам */
+  z-index: 1000; /* Высокий z-index, чтобы быть поверх других элементов карты */
+  white-space: nowrap; /* Не переносить текст */
+  display: none; /* Скрыт по умолчанию */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Тень */
+}
+/* --- /Стили для подсказки --- */
+
+/* ... (все остальные стили из Map.css) ... */
