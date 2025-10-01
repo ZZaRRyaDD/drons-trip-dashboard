@@ -1,5 +1,5 @@
 {
-  "name": "drone-analytics",
+  "name": "frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -12,8 +12,8 @@
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.3",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4",
-    "recharts": "^2.8.0"
+    "recharts": "^2.15.4",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",

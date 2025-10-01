@@ -76,10 +76,6 @@ function App() {
     }
     params.append('flag_full_dataset', analyzeFullBase.toString());
 
-    // let serverUrl = "localhost:8000"
-    // if (process.env.NODE_ENV === "development") {
-    //   serverUrl = "loc"
-    // }
     const apiUrl = `http://localhost:8000/api/flights/?${params.toString()}`;
 
     try {
@@ -98,7 +94,6 @@ function App() {
       console.log("Получены данные анализа:", data);
       setDashboardData(data);
 
-      // --- /ЗАГЛУШКА ---
     } catch (error) {
       console.error("Ошибка при выполнении анализа:", error);
       setDashboardData(null);
