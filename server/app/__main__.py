@@ -1,4 +1,5 @@
 from fastapi import FastAPI, exceptions, openapi
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import DefaultSettings, get_settings
 from app.endpoints import list_of_routes
@@ -41,6 +42,13 @@ def get_app() -> FastAPI:
     application.add_exception_handler(
         exceptions.RequestValidationError,
         validation_exception_handler,
+    )
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:3000"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
     openapi.utils.validation_error_response_definition = ErrorResponse.schema()
     return application
