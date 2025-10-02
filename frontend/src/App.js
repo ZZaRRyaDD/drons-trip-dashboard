@@ -76,7 +76,12 @@ function App() {
     }
     params.append('flag_full_dataset', analyzeFullBase.toString());
 
-    const apiUrl = `http://localhost:8000/api/flights/?${params.toString()}`;
+    let serverUrl = "localhost:8000"
+    if (process.env.NODE_ENV == "production") {
+      serverUrl = "193.168.46.16"
+    }
+
+    const apiUrl = `http://${serverUrl}/api/flights/?${params.toString()}`;
 
     try {
       console.log("Выполнение GET-запроса к:", apiUrl);
