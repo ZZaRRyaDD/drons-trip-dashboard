@@ -12,7 +12,7 @@ function App() {
   // Состояния для фильтров
   const [dateRange, setDateRange] = useState(() => {
     const now = new Date();
-    const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const start = new Date(now.getFullYear(), 1, 1);
     const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     return {
       startDate: start.toISOString().split('T')[0],
@@ -70,7 +70,7 @@ function App() {
     const params = new URLSearchParams();
     params.append('from', dateRange.startDate);
     params.append('to', dateRange.endDate);
-    params.append('linear-step', lineChartStep);
+    params.append('linear_step', lineChartStep);
     if (selectedRegion) { // Отправляем region, если он выбран
       params.append('region', selectedRegion.title);
     }
@@ -81,7 +81,7 @@ function App() {
       serverUrl = "193.168.46.16"
     }
 
-    const apiUrl = `http://${serverUrl}/api/flights/?${params.toString()}`;
+    const apiUrl = `http://${serverUrl}/api/v1/flights/?${params.toString()}`;
 
     try {
       console.log("Выполнение GET-запроса к:", apiUrl);

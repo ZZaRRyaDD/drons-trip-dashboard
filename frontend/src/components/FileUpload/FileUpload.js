@@ -39,7 +39,7 @@ const FileUpload = () => {
     if (process.env.NODE_ENV === "production") {
       serverUrl = "193.168.46.16"; // IP production сервера
     }
-    const uploadUrl = `http://${serverUrl}/api/flights/upload`; // Новый эндпоинт
+    const uploadUrl = `http://${serverUrl}/api/v1/flights/upload/`; // Новый эндпоинт
 
     // Создаём объект FormData для отправки файла
     const formData = new FormData();
@@ -66,7 +66,7 @@ const FileUpload = () => {
         console.log('Успешная загрузка:', result);
         setUploadStatus('success');
         // Сообщение может прийти от сервера, например, result.message
-        setUploadMessage(result.message || `Файл "${selectedFile.name}" успешно загружен.`);
+        setUploadMessage(result?.message || `Файл "${selectedFile.name}" успешно загружен.`);
         
         // Сбросить выбор файла после успешной загрузки
         setSelectedFile(null);
