@@ -39,12 +39,6 @@ services:
   server:
     image: ghcr.io/zzarryadd/server:latest
     restart: always
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-      args:
-        MODE: "--without dev"
-        APP_HOME: "/server"
     volumes:
       - ./logs/:/server/logs/
     env_file:
@@ -68,3 +62,23 @@ services:
         max_attempts: 5
         window: 60s
     command: make run-prod
+
+  frontend:
+    image: ghcr.io/zzarryadd/frontend:latest
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 2
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+        delay: 10s
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+      restart_policy:
+        condition: any
+        delay: 20s
+        max_attempts: 5
+        window: 60s
