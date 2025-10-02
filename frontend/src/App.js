@@ -77,7 +77,7 @@ function App() {
     params.append('flag_full_dataset', analyzeFullBase.toString());
 
     let serverUrl = "localhost:8000"
-    if (process.env.NODE_ENV == "production") {
+    if (process.env.NODE_ENV === "production") {
       serverUrl = "193.168.46.16"
     }
 

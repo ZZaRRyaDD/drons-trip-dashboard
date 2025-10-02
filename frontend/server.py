@@ -29,6 +29,21 @@ def get_flights():
     """
     return transform(df=df)
 
+from fastapi import (
+    File,
+    UploadFile,
+)
+
+@app.post(
+    "/api/flights/upload/",
+)
+async def create_file(
+    file: UploadFile = File(),
+):
+    print(file)
+
+
+
 
 if __name__ == "__main__":
     import uvicorn

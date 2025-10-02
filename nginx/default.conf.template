@@ -2,7 +2,7 @@ upstream server {
     server server:${APP_PORT};
 }
 
-upstream front {
+upstream frontend {
     server frontend:80;
 }
 
@@ -15,7 +15,7 @@ server {
         log_not_found  off;
     }
 
-    location /api {
+    location /api/ {
         proxy_pass http://server/api/;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $host;
@@ -23,7 +23,7 @@ server {
     }
 
     location / {
-        proxy_pass http://front/;
+        proxy_pass http://frontend;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $host;
         proxy_redirect off;

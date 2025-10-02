@@ -1,0 +1,150 @@
+/* src/components/FileUpload/FileUpload.css */
+
+.file-upload-container {
+  text-align: center;
+  width: 100%;
+}
+
+.file-upload-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px; /* Увеличен отступ между элементами */
+  padding: 24px; /* Увеличены отступы */
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--surface-color); /* Используем переменную из App.css */
+  box-shadow: var(--shadow-light); /* Тень */
+}
+
+.file-upload-section h3 {
+  margin: 0 0 12px 0; /* Убран верхний отступ, нижний уменьшен */
+  color: var(--text-primary); /* Цвет текста из темы */
+  font-size: 1.25rem; /* Размер заголовка */
+  font-weight: 500; /* Жирность */
+}
+
+/* Стили для обёртки инпута файла */
+.file-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px; /* Отступ между инпутом и лейблом */
+  width: 100%; /* Занимает всю ширину родителя */
+  max-width: 400px; /* Максимальная ширина для лучшего вида */
+}
+
+/* Скрываем стандартный input[file] */
+.file-input-wrapper input[type="file"] {
+  display: none;
+}
+
+/* Стилизованный label, который выступает в роли кнопки выбора файла */
+.file-input-wrapper label {
+  display: block; /* Блочный элемент */
+  width: 100%; /* Занимает всю ширину обёртки */
+  padding: 12px 20px; /* Внутренние отступы */
+  background-color: var(--primary-color); /* Основной цвет из темы */
+  color: var(--text-on-primary); /* Цвет текста на основном цвете */
+  border: none; /* Убираем границу */
+  border-radius: var(--border-radius); /* Скругление углов */
+  cursor: pointer; /* Курсор указатель */
+  transition: background-color 0.2s ease, transform 0.1s ease; /* Плавный переход */
+  font-weight: 500; /* Жирность текста */
+  text-align: center; /* Центрирование текста */
+  box-shadow: var(--shadow-light); /* Тень */
+  overflow: hidden; /* Скрываем переполнение */
+  text-overflow: ellipsis; /* Многоточие, если текст не помещается */
+  white-space: nowrap; /* Запрещаем перенос строк */
+}
+
+.file-input-wrapper label:hover {
+  background-color: var(--primary-color-light); /* Более светлый цвет при наведении */
+  transform: translateY(-2px); /* Лёгкий подъём при наведении */
+}
+
+.file-input-wrapper label:active {
+  transform: translateY(0); /* Возврат на место при клике */
+}
+
+/* Стили для кнопки загрузки */
+.upload-button {
+  padding: 12px 24px; /* Внутренние отступы */
+  font-size: 1rem; /* Размер шрифта */
+  background-color: var(--secondary-color); /* Вторичный цвет из темы */
+  color: var(--text-on-secondary); /* Цвет текста на вторичном цвете */
+  border: none; /* Убираем границу */
+  border-radius: var(--border-radius); /* Скругление углов */
+  cursor: pointer; /* Курсор указатель */
+  transition: background-color 0.2s ease, transform 0.1s ease, opacity 0.2s ease; /* Плавные переходы */
+  font-weight: 500; /* Жирность текста */
+  box-shadow: var(--shadow-light); /* Тень */
+}
+
+.upload-button:hover:not(:disabled) {
+  background-color: var(--secondary-color-light); /* Более светлый цвет при наведении */
+  transform: translateY(-2px); /* Лёгкий подъём при наведении */
+}
+
+.upload-button:active:not(:disabled) {
+  transform: translateY(0); /* Возврат на место при клике */
+}
+
+.upload-button:disabled {
+  background-color: var(--text-light); /* Цвет для отключённого состояния */
+  cursor: not-allowed; /* Курсор "запрещено" */
+  opacity: 0.7; /* Прозрачность */
+  transform: none; /* Без трансформаций */
+}
+
+/* Стили для сообщений о статусе */
+.status {
+  margin: 0; /* Убираем внешние отступы */
+  padding: 10px 15px; /* Внутренние отступы */
+  border-radius: var(--border-radius); /* Скругление углов */
+  font-weight: 500; /* Жирность текста */
+  font-size: 0.95rem; /* Размер шрифта */
+  width: 100%; /* Занимает всю ширину */
+  max-width: 400px; /* Максимальная ширина */
+  text-align: center; /* Центрирование текста */
+  box-sizing: border-box; /* Включаем padding и border в ширину */
+}
+
+.status.success {
+  background-color: #dcfce7; /* Светло-зелёный фон */
+  color: #166534; /* Тёмно-зелёный текст */
+  border: 1px solid #bbf7d0; /* Зелёная граница */
+}
+
+.status.error {
+  background-color: #fee2e2; /* Светло-красный фон */
+  color: #b91c1c; /* Тёмно-красный текст */
+  border: 1px solid #fecaca; /* Красная граница */
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .file-upload-section {
+    padding: 16px; /* Уменьшаем отступы на мобильных */
+    gap: 12px; /* Уменьшаем отступы между элементами */
+  }
+
+  .file-upload-section h3 {
+    font-size: 1.1rem; /* Уменьшаем размер заголовка */
+  }
+
+  .file-input-wrapper label {
+    padding: 10px 16px; /* Уменьшаем отступы */
+    font-size: 0.95rem; /* Уменьшаем размер шрифта */
+  }
+
+  .upload-button {
+    padding: 10px 20px; /* Уменьшаем отступы */
+    font-size: 0.95rem; /* Уменьшаем размер шрифта */
+  }
+
+  .status {
+    padding: 8px 12px; /* Уменьшаем отступы */
+    font-size: 0.9rem; /* Уменьшаем размер шрифта */
+  }
+}
