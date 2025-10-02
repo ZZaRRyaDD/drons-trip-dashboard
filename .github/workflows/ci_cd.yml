@@ -22,6 +22,7 @@ env:
   REGISTRY: ghcr.io
   NGINX_IMAGE_NAME: zzarryadd/nginx:latest
   BACKEND_IMAGE_NAME: zzarryadd/server:latest
+  FRONTEND_IMAGE_NAME: zzarryadd/frontend:latest
   APP_PORT: 8000
   APP_HOST: 0.0.0.0
   SECRET_KEY: XlctT801zTrepfc5PsR4U4U2vJ6HhRrPdd1Wp8SYvo
@@ -55,7 +56,7 @@ jobs:
       contents: read
 
     steps:
-      - name: Delete old django packages
+      - name: Delete old server packages
         uses: actions/delete-package-versions@v4
         with:
           token: ${{ secrets.PAT }}
@@ -68,6 +69,14 @@ jobs:
         with:
           token: ${{ secrets.PAT }}
           package-name: "nginx"
+          package-type: "container"
+          min-versions-to-keep: 5
+
+      - name: Delete old frontend packages
+        uses: actions/delete-package-versions@v4
+        with:
+          token: ${{ secrets.PAT }}
+          package-name: "frontend"
           package-type: "container"
           min-versions-to-keep: 5
 
@@ -98,6 +107,11 @@ jobs:
         run: |
           docker build ./nginx --tag ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE_NAME }}
           docker push ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE_NAME }}
+      
+      - name: Build and Publish Frontend Image
+        run: |
+          docker build ./frontend --tag ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
+          docker push ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
 
   deploy:
     name: Deploy app
