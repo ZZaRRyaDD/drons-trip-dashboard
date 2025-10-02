@@ -1,13 +1,15 @@
 import re
 import tempfile
-from datetime import date, time
+from collections import Counter
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
 from shapely.geometry import Point
 
-from app.schemas.flights import FlightCreateModel
+from app.db.models import Flight
+from app.schemas.flights import FlightCreateModel, Statistic
 
 regions = gpd.read_file(str(Path(__file__).parent / "admin_4.shp"))
 
@@ -132,3 +134,102 @@ def reg(lon, lat):
     if len(region) > 0:
         return region['name_ru'].values[0]
     return None
+
+
+def format_flight_data(flights: list[Flight]):
+    total_count_flights = len(flights)
+
+    durations = []
+    for flight in flights:
+        if flight.departure_date and flight.departure_time and flight.arrival_date and flight.arrival_time:
+            dep_dt = datetime.combine(flight.departure_date, flight.departure_time)
+            arr_dt = datetime.combine(flight.arrival_date, flight.arrival_time)
+            if arr_dt < dep_dt:
+                arr_dt += timedelta(days=1)
+            duration = (arr_dt - dep_dt).total_seconds() / 60
+            durations.append(duration)
+
+    total_duration = sum(durations)
+    mean_duration = total_duration / len(durations) if durations else 0
+
+    weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+    count_flights_per_weekday = [{} for _ in range(7)]
+    weekday_counts = Counter()
+    for flight in flights:
+        if flight.departure_date:
+            weekday = flight.departure_date.weekday()
+            weekday_counts[weekdays[weekday]] += 1
+    for i, day in enumerate(weekdays):
+        count_flights_per_weekday[i] = {day: weekday_counts[day]}
+
+    bins = [
+        ('< 10 мин', 10),
+        ('10 - 30 мин', 30),
+        ('30 мин - 1 ч', 60),
+        ('1 - 2 ч', 120),
+        ('2 - 4 ч', 240),
+        ('4 - 8 ч', 480),
+        ('8 - 12 ч', 720),
+        ('12 - 24 ч', 1440),
+        ('24+ ч', float('inf'))
+    ]
+    distribution_by_flight_duration = [{} for _ in range(len(bins))]
+
+    duration_dist = Counter()
+    for dur in durations:
+        for label, limit in bins:
+            if dur <= limit:
+                duration_dist[label] += 1
+                break
+    for i, bin in enumerate(bins):
+        for label, count in duration_dist.items():
+            if label == bin[0]:
+                distribution_by_flight_duration[i] = {label: count}
+                break
+
+    type_counts = Counter(f.type_aircraft for f in flights if f.type_aircraft)
+    distribution_by_type = dict(type_counts)
+
+    null_features = Counter()
+    for f in flights:
+        if not f.arrival_date:
+            null_features["Дата посадки"] += 1
+        if not f.arrival_time:
+            null_features["Время посадки"] += 1
+        if not f.reg_arrival:
+            null_features["Регион посадки"] += 1
+        if not f.arrival_latitude:
+            null_features["Широта региона посадки"] += 1
+        if not f.arrival_longitude:
+            null_features["Долгота региона посадки"] += 1
+        if not f.type_aircraft:
+            null_features["Тип ВС"] += 1
+        if not f.departure_date:
+            null_features["Дата вылета"] += 1
+        if not f.departure_time:
+            null_features["Время вылета"] += 1
+        if not f.reg_departure:
+            null_features["Регион вылета"] += 1
+        if not f.departure_latitude:
+            null_features["Широта региона вылета"] += 1
+        if not f.departure_longitude:
+            null_features["Долгота региона вылета"] += 1
+    distribution_null_features = dict(null_features)
+
+    month_counts = Counter()
+    for f in flights:
+        if f.departure_date:
+            month_key = f.departure_date.strftime("%m.%Y")
+            month_counts[month_key] += 1
+    count_flights_by_month = [{k: v} for k, v in sorted(month_counts.items())]
+
+    return Statistic(
+        total_count_flights=total_count_flights,
+        total_duration=round(total_duration),
+        mean_duration=round(mean_duration),
+        count_flights_per_weekday=count_flights_per_weekday,
+        distribution_by_flight_duration=distribution_by_flight_duration,
+        distribution_by_type=distribution_by_type,
+        distribution_null_features=distribution_null_features,
+        count_flights_by_month=count_flights_by_month,
+    )

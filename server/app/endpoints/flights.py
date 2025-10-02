@@ -17,7 +17,7 @@ from starlette import status
 from app.db.connection import get_session
 from app.db.repository import FlightRepository
 from app.schemas.flights import Statistic
-from app.utils.flight import parse_input_file
+from app.utils.flight import format_flight_data, parse_input_file
 
 api_router = APIRouter(
     prefix="/flights",
@@ -36,29 +36,25 @@ api_router = APIRouter(
 )
 async def get_statistic( # pylint: disable=too-many-arguments, unused-variable, too-many-positional-arguments
     _: Request,
-    from_: Optional[date] = Query(..., alias="from", description="DD-MM-YYYY"),
-    to: Optional[date] = Query(..., description="DD-MM-YYYY"),
-    top: bool = Query(True, description="Если true — сортировать по newest first"),
-    count: Optional[int] = Query(10, ge=1, le=50, description="Макс. число записей"),
-    linear_from: Optional[str] = Query(None, alias="linear-from", description="MM-YYYY"),
-    linear_to: Optional[str]= Query(None, alias="linear-to", description="MM-YYYY"),
-    region: str = Query(None, description='Регион (строка, кавычки не обязательны)'),
+    from_: Optional[date] = Query(date(2025,1,1), alias="from", description="DD-MM-YYYY"),
+    to: Optional[date] = Query(date.today(), description="DD-MM-YYYY"),
+    region: str = Query(None, description='Регион'),
+    flag_full_dataset: bool = Query(False, description='Игнорированиие среза данных'),
     session: AsyncSession = Depends(get_session),
 ):
     flights = await FlightRepository().get_statistic(
         session=session,
-        departure_date=from_,
-        arrival_date=to,
-        top=top,
-        count=count,
-        linear_from=linear_from,
-        linear_to=linear_to,
+        departure_date_from=from_,
+        departure_date_to=to,
         region=region,
+        flag_full_dataset=flag_full_dataset,
     )
+
+    return format_flight_data(flights)
 
 
 @api_router.post(
-    "/files/",
+    "/upload/",
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_400_BAD_REQUEST: {

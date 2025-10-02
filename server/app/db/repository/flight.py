@@ -44,20 +44,25 @@ class FlightRepository(BaseRepository[Flight, FlightCreateModel, None]):
     async def get_statistic(  # pylint: disable=unused-argument, too-many-arguments
         self,
         session: AsyncSession,
-        *, departure_date: date, arrival_date: date, top: bool, count: int,
-        linear_from: str | None, linear_to: str | None, region: str,
+        *, departure_date_from: date, departure_date_to: date,
+        region: str,
+        flag_full_dataset: bool,
     ) -> list[Flight]:
-        region_clean = region.strip().strip('"').strip("'")
-        query = select(self.model).where(
-            or_(
-                self.model.reg_departure.ilike(f"%{region_clean}%"),
-                self.model.reg_arrival.ilike(f"%{region_clean}%"),
-            ),
-        )
+        query = select(self.model)
 
+        if not flag_full_dataset:
+            if departure_date_from:
+                query = query.filter(Flight.departure_date >= departure_date_from)
+            if departure_date_to:
+                query = query.filter(Flight.departure_date <= departure_date_to)
 
-
-        query = query.limit(count)
+        if region:
+            query = query.where(
+                or_(
+                    self.model.reg_departure.ilike(f"%{region}%"),
+                    self.model.reg_arrival.ilike(f"%{region}%"),
+                ),
+            )
 
         result = await session.execute(query)
-        return result.scalar()
+        return result.scalars().all()
