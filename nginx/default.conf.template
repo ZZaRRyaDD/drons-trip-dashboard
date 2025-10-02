@@ -1,5 +1,9 @@
-upstream localhost {
+upstream server {
     server server:${APP_PORT};
+}
+
+upstream front {
+    server frontend:80;
 }
 
 server {
@@ -11,22 +15,29 @@ server {
         log_not_found  off;
     }
 
+    location /api {
+        proxy_pass http://server/api/;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+
     location / {
-        proxy_pass http://localhost/;
+        proxy_pass http://front/;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $host;
         proxy_redirect off;
     }
 
     location /swagger {
-        proxy_pass http://localhost/swagger;
+        proxy_pass http://server/swagger;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $host;
         proxy_redirect off;
     }
     
     location /openapi.json {
-        proxy_pass http://localhost/openapi.json;
+        proxy_pass http://server/openapi.json;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $host;
         proxy_redirect off;
