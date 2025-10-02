@@ -136,7 +136,7 @@ def reg(lon, lat):
     return None
 
 
-def format_flight_data(flights: list[Flight]):
+def format_flight_data(flights: list[Flight], linear_step: str):
     total_count_flights = len(flights)
 
     durations = []
@@ -216,12 +216,12 @@ def format_flight_data(flights: list[Flight]):
             null_features["Долгота региона вылета"] += 1
     distribution_null_features = dict(null_features)
 
-    month_counts = Counter()
+    time_counts = Counter()
     for f in flights:
         if f.departure_date:
-            month_key = f.departure_date.strftime("%m.%Y")
-            month_counts[month_key] += 1
-    count_flights_by_month = [{k: v} for k, v in sorted(month_counts.items())]
+            key = get_time_key(f.departure_date, linear_step)
+            time_counts[key] += 1
+    count_flights_by_month = [{k: v} for k, v in sorted(time_counts.items())]
 
     return Statistic(
         total_count_flights=total_count_flights,
@@ -233,3 +233,16 @@ def format_flight_data(flights: list[Flight]):
         distribution_null_features=distribution_null_features,
         count_flights_by_month=count_flights_by_month,
     )
+
+
+def get_time_key(date: datetime.date, granularity: str) -> str:
+    if granularity == 'day':
+        return date.strftime("%d.%m.%Y")
+    elif granularity == 'week':
+        return date.strftime("%Y-W%W")
+    elif granularity == 'month':
+        return date.strftime("%m.%Y")
+    elif granularity == 'year':
+        return date.strftime("%Y")
+    else:
+        raise ValueError(f"Unsupported granularity: {granularity}")

@@ -39,6 +39,7 @@ async def get_statistic( # pylint: disable=too-many-arguments, unused-variable, 
     from_: Optional[date] = Query(date(2025,1,1), alias="from", description="DD-MM-YYYY"),
     to: Optional[date] = Query(date.today(), description="DD-MM-YYYY"),
     region: str = Query(None, description='Регион'),
+    linear_step: str = Query("month", description='Шаг в графике'),
     flag_full_dataset: bool = Query(False, description='Игнорированиие среза данных'),
     session: AsyncSession = Depends(get_session),
 ):
@@ -50,7 +51,13 @@ async def get_statistic( # pylint: disable=too-many-arguments, unused-variable, 
         flag_full_dataset=flag_full_dataset,
     )
 
-    return format_flight_data(flights)
+    if not flights:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            detail="Has not some statistic",
+        )
+
+    return format_flight_data(flights, linear_step)
 
 
 @api_router.post(

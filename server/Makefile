@@ -40,7 +40,7 @@ run:  ##@Application Run application server
 	make migrate head && uvicorn $(APPLICATION_NAME).__main__:app --host ${APP_HOST} --port ${APP_PORT} --reload
 
 run-prod:  ##@Application Run application server
-	make migrate head && gunicorn $(APPLICATION_NAME).__main__:app -c ./app/config/gunicorn.py
+	make migrate head && gunicorn $(APPLICATION_NAME).__main__:app -c ./app/config/gunicorn.py --timeout=300
 
 migrate:  ##@Database Do all migrations in database
 	cd $(APPLICATION_NAME)/db && alembic upgrade $(args)

@@ -2,7 +2,7 @@ from datetime import date, time
 from typing import Any
 
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import or_, select
+from sqlalchemy import exc, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Flight
@@ -38,8 +38,12 @@ class FlightRepository(BaseRepository[Flight, FlightCreateModel, None]):
             if obj_in_data["departure_time"]:
                 db_obj.departure_time = time.fromisoformat(obj_in_data["departure_time"])
 
-            session.add(db_obj)
-        await session.commit()
+            try:
+                session.add(db_obj)
+                await session.commit()
+            except (exc.IntegrityError, exc.PendingRollbackError) as exception:
+                print(exception)
+                continue
 
     async def get_statistic(  # pylint: disable=unused-argument, too-many-arguments
         self,
