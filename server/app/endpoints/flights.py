@@ -25,7 +25,7 @@ api_router = APIRouter(
 )
 
 @api_router.get(
-    "",
+    "/",
     status_code=status.HTTP_200_OK,
     response_model=Statistic,
     responses={
